@@ -1,16 +1,14 @@
 
-// Main page displaying Nithin's photo, headline and Chat component
-
 import React from 'react';
 import Chat from '../components/Chat';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#202123] flex flex-col items-center px-4 pt-12 pb-6">
-      {/* Nithin photo */}
+      {/* User uploaded photo */}
       <img
-        src="/lovable-uploads/1727341923509.jpg"
-        alt="Nithin"
+        src="/lovable-uploads/2c504600-4018-48a0-bc87-b43a4aa7acd8.png"
+        alt="User uploaded"
         className="w-28 h-28 rounded-full shadow-lg object-cover mb-4"
         draggable={false}
       />
@@ -29,3 +27,4 @@ const Index = () => {
 };
 
 export default Index;
+

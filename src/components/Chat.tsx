@@ -74,8 +74,17 @@ const Chat = () => {
 
       const data = await response.json();
 
-      // Assume the response has a property 'reply' with bot answer
-      const botReply = data.reply ?? "Sorry, I could not get a response.";
+      // According to webhook response observed, the property 'reply' may be missing
+      // So check for 'reply' and fallback to message or other property or default
+      let botReply = "Sorry, I could not get a response.";
+
+      if (typeof data === "object" && data !== null) {
+        if ("reply" in data && typeof data.reply === "string") {
+          botReply = data.reply;
+        } else if ("message" in data && typeof data.message === "string") {
+          botReply = data.message;
+        }
+      }
 
       // Replace typing bot message with actual text
       setMessages((prev) =>
@@ -87,8 +96,9 @@ const Chat = () => {
       );
     } catch (error) {
       toast({
-        title: "Oops, something went wrong",
-        description: "Failed to get bot response. Please try again.",
+        title: "Webhook request failed",
+        description:
+          "Failed to get bot response from N8N webhook. Please check your webhook and try again.",
         variant: "destructive",
       });
       // Remove typing message on error
