@@ -20,12 +20,10 @@ const Chat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll chat to bottom on messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Toggle dark mode by toggling class on html element
   useEffect(() => {
     const html = window.document.documentElement;
     if (isDarkMode) {
@@ -35,7 +33,6 @@ const Chat = () => {
     }
   }, [isDarkMode]);
 
-  // Handle sending user message and fetching bot response
   const handleSend = async () => {
     if (!input.trim()) {
       return;
@@ -52,14 +49,12 @@ const Chat = () => {
     setIsTyping(true);
 
     try {
-      // Add a temporary bot message with typing indicator
       const tempBotMessageId = crypto.randomUUID();
       setMessages((prev) => [
         ...prev,
         { id: tempBotMessageId, text: "", sender: "bot", typing: true },
       ]);
 
-      // Send user input to the webhook
       const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -74,11 +69,14 @@ const Chat = () => {
 
       const data = await response.json();
 
-      // According to webhook response observed, the property 'reply' may be missing
-      // So check for 'reply' and fallback to message or other property or default
+      // Handle webhook response array with objects containing 'output'
       let botReply = "Sorry, I could not get a response.";
 
-      if (typeof data === "object" && data !== null) {
+      if (Array.isArray(data) && data.length > 0 && typeof data[0] === "object" && data[0] !== null) {
+        if ("output" in data[0] && typeof data[0].output === "string") {
+          botReply = data[0].output;
+        }
+      } else if (typeof data === "object" && data !== null) {
         if ("reply" in data && typeof data.reply === "string") {
           botReply = data.reply;
         } else if ("message" in data && typeof data.message === "string") {
@@ -86,7 +84,6 @@ const Chat = () => {
         }
       }
 
-      // Replace typing bot message with actual text
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === tempBotMessageId
@@ -101,14 +98,12 @@ const Chat = () => {
           "Failed to get bot response from N8N webhook. Please check your webhook and try again.",
         variant: "destructive",
       });
-      // Remove typing message on error
       setMessages((prev) => prev.filter((m) => !m.typing));
     } finally {
       setIsTyping(false);
     }
   };
 
-  // Allow sending with Enter key (shift+enter for new line)
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -120,7 +115,6 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto bg-white dark:bg-[#343541] rounded-lg shadow-md overflow-hidden">
-      {/* Header with dark mode toggle */}
       <div className="flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-[#202123] border-b border-gray-300 dark:border-[#444654]">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 select-none">
           Nithin's ChatGPT Test
@@ -138,7 +132,6 @@ const Chat = () => {
         </button>
       </div>
 
-      {/* Chat messages container */}
       <div
         className="flex-1 px-6 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-[#282b33]"
         style={{ scrollbarGutter: "stable" }}
@@ -163,17 +156,12 @@ const Chat = () => {
             aria-live={msg.sender === "bot" ? "polite" : undefined}
             role={msg.typing ? "status" : undefined}
           >
-            {msg.typing ? (
-              <TypingAnimation />
-            ) : (
-              msg.text
-            )}
+            {msg.typing ? <TypingAnimation /> : msg.text}
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
