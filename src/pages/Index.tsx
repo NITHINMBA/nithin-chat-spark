@@ -1,11 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+// Main page displaying Nithin's photo, headline and Chat component
+
+import React from 'react';
+import Chat from '../components/Chat';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#202123] flex flex-col items-center px-4 pt-12 pb-6">
+      {/* Nithin photo */}
+      <img
+        src="/lovable-uploads/1727341923509.jpg"
+        alt="Nithin"
+        className="w-28 h-28 rounded-full shadow-lg object-cover mb-4"
+        draggable={false}
+      />
+
+      {/* Headline */}
+      <h1 className="mb-8 text-center font-semibold text-2xl md:text-3xl max-w-lg text-gray-900 dark:text-gray-50 font-serif select-none drop-shadow-sm">
+        Let's try the test version of ChatGPT from Nithin
+      </h1>
+
+      {/* Chat component */}
+      <div className="flex-1 w-full max-w-4xl">
+        <Chat />
       </div>
     </div>
   );
